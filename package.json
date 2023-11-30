@@ -1,0 +1,42 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "@nuxtjs/color-mode": "^3.3.2",
+    "@nuxtjs/tailwindcss": "^6.10.1",
+    "nuxt": "^3.8.2",
+    "nuxt-icon": "^0.6.6",
+    "vue": "^3.3.8",
+    "vue-router": "^4.2.5"
+  },
+  "dependencies": {
+    "@capacitor/core": "^5.5.1",
+    "@capacitor/preferences": "^5.0.6",
+    "@ionic/vue": "^7.5.7",
+    "@pinia/nuxt": "^0.5.1",
+    "@vuepic/vue-datepicker": "^7.3.0",
+    "animate.css": "^4.1.1",
+    "awesome-toast-component": "^2.0.6",
+    "chart.js": "^4.4.0",
+    "crypto-js": "^4.2.0",
+    "daisyui": "^4.4.14",
+    "epic-spinners": "^2.0.0",
+    "firebase": "^10.7.0",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.7.1",
+    "moment": "^2.29.4",
+    "nanoid": "^5.0.3",
+    "pinia": "^2.1.7",
+    "vue-chartjs": "^5.2.0",
+    "vue-loading-overlay": "^6.0.3"
+  }
+}

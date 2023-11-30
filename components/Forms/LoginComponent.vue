@@ -5,15 +5,15 @@
             <img src="../../img/logo.png" alt="" class="w-52">
         </div>
         
-        <form @submit.prevent="loginDeff" class = "flex flex-col items-center">
-            <p class="text-primary text-sm text-center mb-2"><Icon name="uil:user-circle" class = "text-2xl"/> Introducir cuenta Administrador</p>
+        <form @submit.prevent="loginDeff" class = "flex flex-col items-center shadow border border-primary p-5 rounded-lg">
+            <p class="text-primary text-sm text mb-2"><Icon name="uil:user-circle" class = "text-2xl"/> Introducir cuenta Administrador</p>
             <div class="grid grid-rows-1 gap-2">
-                <label  class="input-group">
-                    <span></span>
+                <label  class="input-group flex flex-row items-center">
+                    <span class="btn bg-transparent border-none"><Icon name = "uil:user-check" class="text-2xl"></Icon></span>
                     <input v-model="email" type="text" placeholder="miemail@miemail.com" class="input input-bordered" />
                 </label>
                 <label class="input-group">
-                    <span></span>
+                    <span class="btn bg-transparent border-none"><Icon name = "uil:text-strike-through" class="text-2xl"/></span>
                     <input v-model="pass" type="password" placeholder="*********" class="input input-bordered" />
                 </label>
                 <button type="submit" class="btn btn-primary w-full">Entrar <Icon name="uil:arrow-circle-right" class = "text-2xl"/></button>
@@ -74,7 +74,7 @@ export default {
                             key: 'clientdata',
                             value: `${JSON.stringify(datos)}`
                         });
-                        this.router.push("/documents")
+                        window.location.href = "/"
                 }
             }
         },

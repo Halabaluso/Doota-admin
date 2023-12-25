@@ -25,7 +25,7 @@
                                     @click="cogerDatos(user.name, `nombre`, `name`, user.index)" for="eliminaruser"><i
                                         class="fa-solid fa-pen-to-square p-2 text-yellow-600"></i></label></p>
                             <p class="font-thin">Registro {{ user.register }} </p>
-                            <p class="font-thin text-xs font-bold">ID: {{ user.index }} </p>
+                            <p class="font-thin text-xs font-bold">ID: {{ user.id }} </p>
                         </td>
                         <td v-if="index >= initLimit && index <= limitPage">
                             <div class="flex flex-col text-sm">
@@ -50,10 +50,10 @@
                             </select>
                         </td>
                         <td v-if="index >= initLimit && index <= limitPage">
-                            <button @click="bloquearUsuario(user.index)"
+                            <button @click="bloquearUsuario(user.id)"
                                 v-if="user.access === undefined || user.access === `accepted`"
                                 class="btn w-max btn-primary">Bloquear <i class="fa-solid fa-lock ml-2"></i></button>
-                            <button @click="aceptarUsuario(user.index)" v-if="user.access === `denied`"
+                            <button @click="aceptarUsuario(user.id)" v-if="user.access === `denied`"
                                 class="btn btn-sm border-none bg-green-600 w-max">Desbloquear <i
                                     class="fa-solid fa-lock ml-2 "></i></button>
                         </td>
@@ -120,10 +120,14 @@ export default {
         CirclesToRhombusesSpinner
     },
     async mounted() {
-        let datos = await baseConnect(`user`)
-        let datosArray = Object.values(datos)
-        this.numberUsers = datosArray.length
-        this.allusers = datosArray
+        try {
+            let datos = await baseConnect(`user`)
+            let datosArray = Object.values(datos)
+            this.numberUsers = datosArray.length
+            this.allusers = datosArray
+        } catch (error) {
+            console.log("Not users")
+        }
     },
     methods: {
         async search() {
@@ -192,6 +196,7 @@ export default {
         },
         async bloquearUsuario(index) {
             this.indexUser2 = index
+            console.log(index)
             if (this.indexUser2 !== undefined) {
                 new Toast("Bloqueando usuario.")
                 await baseConnectPut(`user/${this.indexUser2}/access`, "denied")

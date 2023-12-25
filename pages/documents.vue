@@ -16,7 +16,7 @@
             <NuxtLink to="/documents" role="tab" class="tab tab-active">Enviar</NuxtLink>
             <NuxtLink to="/searchdocuments" role="tab" class="tab">Buscar</NuxtLink>
             <NuxtLink to = "/singdocuments" role="tab" class="tab">Firmar</NuxtLink>
-            <NuxtLink to="/searchsigndocuments" role="tab" class="tab">Buscar firmas</NuxtLink>
+            <NuxtLink to="/searchsigndocuments" role="tab" class="tab">Buscar</NuxtLink>
         </div>
         <div :class="{ hidden: !spinnerShow }">
             <FormsSendDocuments />

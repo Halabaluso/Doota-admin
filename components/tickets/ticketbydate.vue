@@ -4,7 +4,7 @@
         <div class="my-4 overflow-x-auto">
             <div class="my-5 text-gray-700 max-w-xs">
                 <label class="text-sm italic" for=""><i class="fa-solid fa-clock"></i> Fecha subida</label>
-                <Datepicker placeholder = "Seleccionar fecha" v-model="date" class="w-64" month-picker @update:modelValue="buscarMes"></Datepicker>
+                <Datepicker placeholder = "Seleccionar fecha" v-model="date" class="w-64 z-50" month-picker @update:modelValue="buscarMes"></Datepicker>
             </div>
             <table class="table w-full my-4">
                 <!-- head -->
@@ -176,6 +176,32 @@ export default {
                 mesPasado = mesPasado - 1
             }
             this.data1 = await baseConnect(`ticket/${mesPasado}-${anoPasado}`)
+        },
+        async buscarMes() {
+            this.spinnerShow = false
+            this.ticketListDate = ""
+            try {
+                if (this.date !== null) {
+                    new Toast("Buscando tickets, espere...")
+                    let fechaDeff = moment(this.date).format("MM-YYYY")
+                    let datos = await baseConnect(`ticket/${fechaDeff}`)
+                    if (datos !== null) {
+                        this.ticketListDate = datos
+                        new Toast("Tickets encontrados.")
+                        this.spinnerShow = true
+                    } else {
+                        new Toast("Ningun ticket encontrado.")
+                        this.spinnerShow = true
+                    }
+                } else {
+                    new Toast("Seleccione una fecha.")
+                    this.spinnerShow = true
+                }
+            } catch (error) {
+                console.log(error)
+                new Toast("Ningun ticket encontrado.")
+                this.spinnerShow = true
+            }
         },
         txNombres(event) {
             if ((event.keyCode != 32) && (event.keyCode < 48) || (event.keyCode > 57) && (event.keyCode < 65) || (event.keyCode > 90) && (event.keyCode < 97) || (event.keyCode > 122))

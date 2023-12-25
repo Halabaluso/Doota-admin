@@ -235,12 +235,6 @@ export default {
     components: {
         CirclesToRhombusesSpinner
     },
-    async mounted() {
-        let datos = await baseConnect(`user`)
-        let datosArray = Object.values(datos)
-        this.numberUsers = datosArray.length
-        this.allusers = datosArray
-    },
     methods: {
         async search() {
             this.spinnerShow = false

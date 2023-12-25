@@ -1,7 +1,7 @@
 <template>
     <div class="bg-white rounded-lg shadow p-5 m-5 text-gray-700 border-b border-primary">
         <p class="font-bold"><i class="fa-solid fa-users"></i> Buscar usuario</p>
-        <div class="input-group my-4">
+        <div class="flex flex-row mt-4">
             <input v-model="usersearch" type="text" placeholder="Buscar por DNI" class="input input-bordered" />
             <button @click="search" class="btn btn-square">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -54,10 +54,10 @@
                             </select>
                         </td>
                         <td>
-                            <button @click="bloquearUsuario(user.index)"
+                            <button @click="bloquearUsuario(user.id)"
                                 v-if="user.access === undefined || user.access === `accepted`" class="btn btn-sm btn-primary">Bloquear
                                 <i class="fa-solid fa-lock ml-2"></i></button>
-                            <button @click="aceptarUsuario(user.index)" v-if="user.access === `denied`"
+                            <button @click="aceptarUsuario(user.id)" v-if="user.access === `denied`"
                                 class="btn btn-sm border-none bg-green-600">Desbloquear <i
                                     class="fa-solid fa-lock ml-2 "></i></button>
                         </td>

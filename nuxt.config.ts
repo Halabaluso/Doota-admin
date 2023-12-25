@@ -21,6 +21,9 @@ export default defineNuxtConfig({
         storageBucket: process.env.storageBucket,
         messagingSenderId: process.env.messagingSenderId,
         appId: process.env.appId
+      },
+      mailConfig:{
+        password: process.env.passwordemail
       }
     }
   }

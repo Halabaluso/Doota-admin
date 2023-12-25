@@ -10,9 +10,9 @@
             </div>
         </div>
     </div>
-    <div class="m-5 rounded-lg shadow-lg bg-white text-gray-700">
-        <p class="font-bold text-xl mt-10 text-primary">
-            <Icon name="dashicons:admin-users"></Icon> Buscar cliente
+    <div class="m-5 rounded-lg shadow-lg bg-white text-gray-700 p-5">
+        <p class="font-bold text-xl text-primary">
+            <Icon name="dashicons:admin-users"></Icon> Datos de empresa
         </p>
         <div class="form-control my-2">
             <label class="label">

@@ -1,6 +1,6 @@
 <template>
-    <div class="m-5 bg-white rounded-lg border-b border-primary text-gray-700">
-        <p class="font-bold text-xl mt-10 text-primary">
+    <div class="m-5 bg-white rounded-lg border-b border-primary text-gray-700 p-5">
+        <p class="font-bold text-xl text-primary">
             <Icon name="dashicons:tickets-alt"></Icon> Tickets pendientes
         </p>
         <div v-if="data !== null" class="overflow-x-auto my-4">
@@ -90,6 +90,29 @@
                     <textarea v-model="ticketResponse" class="textarea textarea-bordered w-full"
                         placeholder="Te enviaremos el certificado que solicitas a través del apartado de documentos."></textarea>
                 </div>
+                <div>
+                    <div class="flex flex-col flex-1 m-1">
+                        <label class="mb-1 text-sm" for="">
+                            <Icon name="dashicons:cloud"></Icon> Subir archivo
+                        </label>
+                        <input @change="insertarPdf($event)" type="file" class="file-input file-input-bordered w-full "
+                            accept="application/pdf" />
+                        <div v-if="arrayfiles.length > 0">
+                            <p class="my-1">Documentos seleccionados:</p>
+                            <div v-for="(files, i) in arrayfiles">
+                                <p class="flex flex-row justify-between w-full font-bold items-center mb-1">
+                                <p>
+                                    <Icon name="material-symbols:drive-file-move-outline-sharp"></Icon> {{ i + 1 }} {{
+                                        files.name }}
+                                </p>
+                                <button @click="deleteArrayDocument(i)" type="button" class="btn btn-sm btn-error">
+                                    <Icon name="material-symbols:delete-sweep"></Icon>
+                                </button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="modal-action">
                     <button v-if="ticketData.pending === `pending`" for="atender" @click="enviarTicket"
                         class="btn bg-green-600 border-none">Responder ticket</button>
@@ -100,6 +123,7 @@
     </div>
 </template>
 <script>
+import { storageRef } from "../plugins/firebase.client";
 import { CirclesToRhombusesSpinner } from "epic-spinners"
 import Datepicker from '@vuepic/vue-datepicker';
 import Toast from "awesome-toast-component"
@@ -111,6 +135,10 @@ export default {
     },
     data() {
         return {
+            arrayfiles: [],
+            file: "",
+            datoFile: "",
+            urlFile: "",
             data: "",
             data1: "",
             ticketData: {
@@ -128,6 +156,7 @@ export default {
             ticketsearch: "",
             ticketlist: "",
             ticketListDate: "",
+            reloadInterval: "",
             date: null,
             spinnerShow: true
         }
@@ -157,6 +186,12 @@ export default {
             new Toast("Algo sucedió al cargar los tickets.")
         }
 
+        this.reloadInterval = setInterval(async () => {
+            await this.recargarDatos()
+        }, 120000);
+    },
+    unmounted() {
+        clearInterval(this.reloadInterval)
     },
     methods: {
         cogerDatosTicket(title, description, name, nie, id, email, day, index, pending) {
@@ -176,25 +211,34 @@ export default {
         async enviarTicket() {
             this.spinnerShow = false
             new Toast("Enviando respuesta.")
-            let objeto = {
-                response: this.ticketResponse,
-                today: moment().format('L'),
-                hour: moment().format('LTS'),
-                id: Date.now()
-            }
-            try {
-                await baseConnectPut(`ticket/${this.ticketData.day.substr(0, 2)}-${this.ticketData.day.substr(6, 4)}/${this.ticketData.id}/response`, objeto)
-                await baseConnectPut(`ticket/${this.ticketData.day.substr(0, 2)}-${this.ticketData.day.substr(6, 4)}/${this.ticketData.id}/pending`, "responsed")
-                await baseConnectPut(`user/${this.ticketData.userIndex}/tickets/${this.ticketData.id}/response`, objeto)
-                await baseConnectPut(`user/${this.ticketData.userIndex}/tickets/${this.ticketData.id}/pending`, "responsed")
-                await this.recargarDatos()
-                new Toast("Respuesta enviada con éxito. 🥳")
-                this.spinnerShow = true
-            } catch (error) {
-                console.log(error)
-                new Toast("Algo malo ha sucedido al enviar la respuesta, posible fallo de conexión. ❌")
-                this.spinnerShow = true
-            }
+            const arraylinks = []
+            this.arrayfiles.forEach(async (element, i) => {
+                let linkDocument = await this.agregarDato(element)
+                arraylinks.push(await linkDocument)
+                if (i  == (this.arrayfiles.length-1)) {
+                    console.log("Pasa :D")
+                    let objeto = {
+                        linksdocuments: arraylinks,
+                        response: this.ticketResponse,
+                        today: moment().format('L'),
+                        hour: moment().format('LTS'),
+                        id: Date.now()
+                    }
+                    try {
+                        await baseConnectPut(`ticket/${this.ticketData.day.substr(0, 2)}-${this.ticketData.day.substr(6, 4)}/${this.ticketData.id}/response`, objeto)
+                        await baseConnectPut(`ticket/${this.ticketData.day.substr(0, 2)}-${this.ticketData.day.substr(6, 4)}/${this.ticketData.id}/pending`, "responsed")
+                        await baseConnectPut(`user/${this.ticketData.userIndex}/tickets/${this.ticketData.id}/response`, objeto)
+                        await baseConnectPut(`user/${this.ticketData.userIndex}/tickets/${this.ticketData.id}/pending`, "responsed")
+                        await this.recargarDatos()
+                        new Toast("Respuesta enviada con éxito. 🥳")
+                        this.spinnerShow = true
+                    } catch (error) {
+                        console.log(error)
+                        new Toast("Algo malo ha sucedido al enviar la respuesta, posible fallo de conexión. ❌")
+                        this.spinnerShow = true
+                    }
+                }
+            })
         },
         async buscarTicket() {
             this.spinnerShow = false
@@ -225,6 +269,31 @@ export default {
                 mesPasado = mesPasado - 1
             }
             this.data1 = await baseConnect(`ticket/${mesPasado}-${anoPasado}`)
+        },
+        async insertarPdf(event) {
+            this.file = event.target.files[0]
+            const reader = new FileReader();
+            reader.readAsDataURL(this.file);
+            reader.onload = (e) => {
+                this.datoFile = e.target.result
+                this.arrayfiles.push(event.target.files[0])
+                new Toast("Documento insertado correctamente")
+            }
+        },
+        async agregarDato(fileelement) {
+            const fileDeff = fileelement
+            await storageRef.child(`${this.ticketData.nie.toUpperCase()}`).child(fileDeff.name).put(fileDeff)
+            const urlDescarga = await storageRef.child(`${this.ticketData.nie.toUpperCase()}`).child(fileDeff.name).getDownloadURL()
+            return urlDescarga
+        },
+        deleteArrayDocument(index) {
+            let newArray = []
+            this.arrayfiles.forEach((element, i) => {
+                if (index !== i) {
+                    newArray.push(element)
+                }
+            })
+            this.arrayfiles = newArray
         },
         txNombres(event) {
             if ((event.keyCode != 32) && (event.keyCode < 48) || (event.keyCode > 57) && (event.keyCode < 65) || (event.keyCode > 90) && (event.keyCode < 97) || (event.keyCode > 122))

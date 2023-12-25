@@ -1,6 +1,6 @@
 <template>
-    <div class="m-5 bg-white rounded-lg border-b border-primary">
-        <p class="font-bold text-xl mt-10 text-primary"><Icon name = "dashicons:id" ></Icon> Buscar documentos por DNI</p>
+    <div class="m-5 bg-white rounded-lg border-b border-primary p-5">
+        <p class="font-bold text-xl text-primary"><Icon name = "dashicons:id" ></Icon> Buscar documentos por DNI</p>
         <form @submit.prevent="cargarDni" class="input-group my-5 flex flex-row items-center">
             <input @keypress="txNombres($event)" v-model="dni" type="text" placeholder="24153786B"
                 class="input input-bordered" />

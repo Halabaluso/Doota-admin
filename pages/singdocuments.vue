@@ -11,10 +11,10 @@
                 </div>
             </div>
             <div role="tablist" class="tabs tabs-boxed m-4">
-                <NuxtLink to="/documents" role="tab" class="tab">Enviar documentos</NuxtLink>
-                <NuxtLink to="/searchdocuments" role="tab" class="tab">Buscar documentos</NuxtLink>
-                <NuxtLink to="/singdocuments" role="tab" class="tab tab-active">Firmar documentos</NuxtLink>
-                <NuxtLink to="/searchsigndocuments" role="tab" class="tab">Buscar firmas</NuxtLink>
+                <NuxtLink to="/documents" role="tab" class="tab">Enviar</NuxtLink>
+                <NuxtLink to="/searchdocuments" role="tab" class="tab">Buscar</NuxtLink>
+                <NuxtLink to="/singdocuments" role="tab" class="tab tab-active">Firmar</NuxtLink>
+                <NuxtLink to="/searchsigndocuments" role="tab" class="tab">Buscar</NuxtLink>
             </div>
             <FormsSignComponent/>
         </div>

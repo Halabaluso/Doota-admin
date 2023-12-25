@@ -1,6 +1,6 @@
 <template >
-    <form @submit.prevent = "insertarPdfDeff" class="m-5 rounded-lg bg-white">
-        <p class="font-bold text-xl mt-10 text-primary"><Icon name = "dashicons:cloud-upload"/> Subir documentos para firmar</p>
+    <form @submit.prevent = "insertarPdfDeff" class="m-5 rounded-lg bg-white p-5 shadow-lg">
+        <p class="font-bold text-xl text-primary"><Icon name = "dashicons:cloud-upload"/> Subir documentos para firmar</p>
         <div class="flex flex-col flex-1 m-1">
             <label class="mb-1 text-sm" for=""><Icon name = "dashicons:cloud"/> Subir archivo</label>
             <input @change="insertarPdf($event)" type="file" class="file-input file-input-bordered w-full "

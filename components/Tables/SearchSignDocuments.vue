@@ -1,6 +1,6 @@
 <template>
-    <div class="m-5 rounded-lg bg-white">
-        <p class="font-bold text-xl mt-10 text-primary"><Icon name = "dashicons:id" ></Icon> Buscar documentos por fecha</p>
+    <div class="m-5 rounded-lg bg-white p-5">
+        <p class="font-bold text-xl text-primary"><Icon name = "dashicons:id" ></Icon> Buscar documentos por fecha</p>
         <div>
             <div class="form-control mt-5">
                 <div class="input-group flex flex-row items-center">

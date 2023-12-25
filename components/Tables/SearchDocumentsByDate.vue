@@ -1,7 +1,7 @@
 <template>
-    <div class="m-5 bg-white rounded-lg border-b border-primary">
+    <div class="m-5 bg-white rounded-lg border-b border-primary p-5">
         <div>
-            <p class="font-bold text-xl mt-10 text-primary"><Icon name = "dashicons:id" ></Icon> Buscar documentos por fecha</p>
+            <p class="font-bold text-xl text-primary"><Icon name = "dashicons:id" ></Icon> Buscar documentos por fecha</p>
             <div class="my-5 text-gray-700">
                 <label class="text-sm italic font-bold" for=""><Icon name = "dashicons:calendar-alt"/> Fecha subida</label>
                 <p class="text-xs italic text-primary mb-2">Desde {{ dateGoodFormat }} hasta {{ dateGoodFormat2 }}

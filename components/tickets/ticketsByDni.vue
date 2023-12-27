@@ -63,6 +63,9 @@
                     <!-- row 2 -->
                 </tbody>
             </table>
+            <div v-if="this.ticketlist === null">
+                <p class="p-5">¡Ningún ticket encontrado! 👍</p>
+            </div>
         </div>
     </div>
     <input type="checkbox" id="atender" class="modal-toggle" />
@@ -130,7 +133,7 @@ export default {
             },
             ticketResponse: "",
             ticketsearch: "",
-            ticketlist: "",
+            ticketlist: null,
             ticketListDate: "",
             date: null,
             spinnerShow: true
@@ -158,12 +161,12 @@ export default {
             let datos = await baseConnectSearch(`user`, `user`, "nie", this.ticketsearch.toUpperCase())
             if (datos === null) {
                 new Toast("Ningún ticket encontrado con este DNI")
+                this.ticketlist = null
                 this.spinnerShow = true
             } else {
                 console.log(datos)
                 let datosClean = Object.values(datos)
                 this.ticketlist = datosClean[0].tickets
-                console.log(this.ticketlist)
                 new Toast("Tickets encontrados. 😀")
                 this.spinnerShow = true
             }

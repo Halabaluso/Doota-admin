@@ -13,7 +13,7 @@
             <div role="tablist" class="tabs tabs-boxed m-4">
                 <NuxtLink to="/tickets" role="tab" class="tab tab-active">Tickets pendientes</NuxtLink>
                 <NuxtLink to="/ticketsbydni" role="tab" class="tab">Buscar por DNI</NuxtLink>
-                <NuxtLink to="/ticketsbydate" role="tab" class="tab">Buscar tickets por mes</NuxtLink>
+                <NuxtLink to="/ticketsbydate" role="tab" class="tab">Buscar por mes</NuxtLink>
             </div>
             <TicketsPendingtickets />
         </div>

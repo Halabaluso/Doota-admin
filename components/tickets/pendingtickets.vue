@@ -16,7 +16,7 @@
                 </thead>
                 <tbody v-for="(ticket) in data" :key="ticket" class="text-sm">
                     <!-- row 1 -->
-                    <tr v-if="ticket.pending === `pending`">
+                    <tr v-if="ticket.pending === `pending`" id = "ticket">
                         <td>
                             <div class="flex flex-col">
                                 <p class="font-bold">
@@ -57,7 +57,7 @@
                     <!-- row 2 -->
                 </tbody>
             </table>
-            <div v-if="data === null">
+            <div v-if="ticketNumber === 0">
                 <p class="p-5">¡Todos los tickets atendidos! 👍</p>
             </div>
         </div>
@@ -114,8 +114,8 @@
                     </div>
                 </div>
                 <div class="modal-action">
-                    <button v-if="ticketData.pending === `pending`" for="atender" @click="enviarTicket"
-                        class="btn bg-green-600 border-none">Responder ticket</button>
+                    <label  v-if="ticketData.pending === `pending`" for="atender" @click="enviarTicket"
+                        class="btn bg-green-600 border-none">Responder ticket</label>
                     <label for="atender" class="btn">Cerrar</label>
                 </div>
             </div>
@@ -152,6 +152,7 @@ export default {
                 userIndex: "",
                 pending: ""
             },
+            ticketNumber:0,
             ticketResponse: "",
             ticketsearch: "",
             ticketlist: "",
@@ -178,6 +179,12 @@ export default {
                 this.data1.forEach(element => {
                     this.data.push(element)
                 })
+            }
+            try {
+                this.ticketNumber = document.querySelectorAll("#ticket").length
+            } catch (error) {
+                //
+                this.ticketNumber = 0
             }
             this.spinnerShow = true
         } catch (error) {
@@ -212,13 +219,8 @@ export default {
             this.spinnerShow = false
             new Toast("Enviando respuesta.")
             const arraylinks = []
-            this.arrayfiles.forEach(async (element, i) => {
-                let linkDocument = await this.agregarDato(element)
-                arraylinks.push(await linkDocument)
-                if (i  == (this.arrayfiles.length-1)) {
-                    console.log("Pasa :D")
+            if (this.arrayfiles.length === 0) {
                     let objeto = {
-                        linksdocuments: arraylinks,
                         response: this.ticketResponse,
                         today: moment().format('L'),
                         hour: moment().format('LTS'),
@@ -229,6 +231,7 @@ export default {
                         await baseConnectPut(`ticket/${this.ticketData.day.substr(0, 2)}-${this.ticketData.day.substr(6, 4)}/${this.ticketData.id}/pending`, "responsed")
                         await baseConnectPut(`user/${this.ticketData.userIndex}/tickets/${this.ticketData.id}/response`, objeto)
                         await baseConnectPut(`user/${this.ticketData.userIndex}/tickets/${this.ticketData.id}/pending`, "responsed")
+                        await this.sendEmail(this.ticketData.email, "Has recibido un ticket de Asesoría Maneiros", "Su ticket ha sido respondido por Asesoría Maneiros, puede visualizar su ticket a través del portal cliente o de nuestra app.")
                         await this.recargarDatos()
                         new Toast("Respuesta enviada con éxito. 🥳")
                         this.spinnerShow = true
@@ -237,8 +240,36 @@ export default {
                         new Toast("Algo malo ha sucedido al enviar la respuesta, posible fallo de conexión. ❌")
                         this.spinnerShow = true
                     }
-                }
-            })
+            } else {
+                this.arrayfiles.forEach(async (element, i) => {
+                    let linkDocument = await this.agregarDato(element)
+                    arraylinks.push(await linkDocument)
+                    if (i == (this.arrayfiles.length - 1)) {
+                        let objeto = {
+                            linksdocuments: arraylinks,
+                            response: this.ticketResponse,
+                            today: moment().format('L'),
+                            hour: moment().format('LTS'),
+                            id: Date.now()
+                        }
+                        try {
+                            await baseConnectPut(`ticket/${this.ticketData.day.substr(0, 2)}-${this.ticketData.day.substr(6, 4)}/${this.ticketData.id}/response`, objeto)
+                            await baseConnectPut(`ticket/${this.ticketData.day.substr(0, 2)}-${this.ticketData.day.substr(6, 4)}/${this.ticketData.id}/pending`, "responsed")
+                            await baseConnectPut(`user/${this.ticketData.userIndex}/tickets/${this.ticketData.id}/response`, objeto)
+                            await baseConnectPut(`user/${this.ticketData.userIndex}/tickets/${this.ticketData.id}/pending`, "responsed")
+                            const response = await this.sendEmail(this.ticketData.email, "Has recibido un ticket de Asesoría Maneiros", "Su ticket ha sido respondido por Asesoría Maneiros, puede visualizar su ticket a través del portal cliente o de nuestra app.")
+                            console.log(response)
+                            await this.recargarDatos()
+                            new Toast("Respuesta enviada con éxito. 🥳")
+                            this.spinnerShow = true
+                        } catch (error) {
+                            console.log(error)
+                            new Toast("Algo malo ha sucedido al enviar la respuesta, posible fallo de conexión. ❌")
+                            this.spinnerShow = true
+                        }
+                    }
+                })
+            }
         },
         async buscarTicket() {
             this.spinnerShow = false
@@ -267,6 +298,13 @@ export default {
                 anoPasado = anoPasado - 1
             } else {
                 mesPasado = mesPasado - 1
+            }
+
+            try {
+                this.ticketNumber = document.querySelectorAll("#ticket").length
+            } catch (error) {
+                //
+                this.ticketNumber = 0
             }
             this.data1 = await baseConnect(`ticket/${mesPasado}-${anoPasado}`)
         },
@@ -324,6 +362,15 @@ export default {
                 new Toast("Ningun ticket encontrado.")
                 this.spinnerShow = true
             }
+        },
+        async sendEmail(donde, asunto, cuerpo) {
+            let response = ""
+            await fetch(`/api/alerts/email?asunto=${asunto}&donde=${donde}&cuerpo=${cuerpo}`).then(data => {
+                return data.json()
+            }).then(data => {
+                response = data
+            })
+            return response
         }
     },
 }

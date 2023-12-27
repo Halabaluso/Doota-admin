@@ -94,6 +94,18 @@ export default {
                         }
                         await baseConnectPut(`sign/${this.nie.toUpperCase()}/${this.id}`, objeto)
                         await baseConnectPut(`sign/historial/${moment().format("MM-YYYY")}/${this.id}`, objeto)
+                        try {
+                            const users = await baseConnect("user")
+                            const usersArray = Object.values(users)
+                            usersArray.forEach(async element => {
+                                if (element.nie === this.nie.toUpperCase()) {
+                                    await this.sendEmail(element.email, "Has recibido un documento para firmar de Asesoría Maneiros", "Asesoría Maneiros te ha enviado un documento para firmar, puedes firmar el documento en la web o en nuestra app.")
+                                }
+                            })
+                        } catch (error) {
+                            //
+                            console.log(error)
+                        }
                         new Toast("Documento enviado y listo para firmar. 😄")
                     })
                     this.spinnerShow = true
@@ -122,6 +134,15 @@ export default {
                 }
             })
             this.arrayfiles = newArray
+        },
+        async sendEmail(donde, asunto, cuerpo) {
+            let response = ""
+            await fetch(`/api/alerts/email?asunto=${asunto}&donde=${donde}&cuerpo=${cuerpo}`).then(data => {
+                return data.json()
+            }).then(data => {
+                response = data
+            })
+            return response
         },
         txNombres(event) {
             if ((event.keyCode != 32) && (event.keyCode < 48) || (event.keyCode > 57) && (event.keyCode < 65) || (event.keyCode > 90) && (event.keyCode < 97) || (event.keyCode > 122))

@@ -50,7 +50,7 @@ import { CirclesToRhombusesSpinner } from 'epic-spinners'
 import Toast from "awesome-toast-component"
 import moment from "moment"
 import { storageRef } from "../plugins/firebase.client";
-import { baseConnectPut, } from "../db/db.js"
+import { baseConnectPut, baseConnect } from "../db/db.js"
 export default {
   data() {
     return {
@@ -94,7 +94,7 @@ export default {
         this.spinnerShow = false
         try {
 
-          this.arrayfiles.forEach(async (element, i) => {
+          if (this.arrayfiles === 0) {
             let linkDocument = await this.agregarDato(element)
             let idDeff = Date.now()
             let objeto = {
@@ -107,14 +107,60 @@ export default {
             }
             await baseConnectPut(`files/${this.nie.toUpperCase()}/${idDeff}`, objeto)
             await baseConnectPut(`historial/${(moment().format('L')).substr(0, 2)}-${(moment().format('L')).substr(3, 2)}-${(moment().format('L')).substr(6, 4)}//${idDeff}`, objeto)
-            new Toast("Documento enviado con éxito.")
-            if (i + 1 === this.arrayfiles.length) {
-              document.querySelector("#enviodocumento").classList.remove("#opacity-5")
-              this.nie = ""
-              this.observations = ""
-              this.spinnerShow = true
+            try {
+              const users = await baseConnect("user")
+              const usersArray = Object.values(users)
+              usersArray.forEach(async element => {
+                console.log(element.nie)
+                console.log(this.nie.toUpperCase())
+                if (element.nie === this.nie.toUpperCase()) {
+                  await this.sendEmail(element.email, "Has recibido un documento de Asesoría Maneiros", "Para visualizar su documento, entre en el portal cliente en maneiros.com o descargue nuestra app.")
+                }
+              })
+            } catch (error) {
+              //
+              console.log(error)
             }
-          })
+            new Toast("Documento enviado con éxito.")
+            document.querySelector("#enviodocumento").classList.remove("#opacity-5")
+            this.nie = ""
+            this.observations = ""
+            this.spinnerShow = true
+          } else {
+            this.arrayfiles.forEach(async (element, i) => {
+              let linkDocument = await this.agregarDato(element)
+              let idDeff = Date.now()
+              let objeto = {
+                id: idDeff,
+                nie: this.nie.toUpperCase(),
+                send: moment().format('LLLL'),
+                today: moment().format('L'),
+                hours: moment().format('LTS'),
+                link: linkDocument,
+              }
+              await baseConnectPut(`files/${this.nie.toUpperCase()}/${idDeff}`, objeto)
+              await baseConnectPut(`historial/${(moment().format('L')).substr(0, 2)}-${(moment().format('L')).substr(3, 2)}-${(moment().format('L')).substr(6, 4)}//${idDeff}`, objeto)
+              try {
+                const users = await baseConnect("user")
+                const usersArray = Object.values(users)
+                usersArray.forEach(async element => {
+                  if (element.nie === this.nie.toUpperCase()) {
+                    await this.sendEmail(element.email, "Has recibido un documento de Asesoría Maneiros", "Para visualizar su documento, entre en el portal cliente en maneiros.com o descargue nuestra app.")
+                  }
+                })
+              } catch (error) {
+                //
+                console.log(error)
+              }
+              new Toast("Documento enviado con éxito.")
+              if (i + 1 === this.arrayfiles.length) {
+                document.querySelector("#enviodocumento").classList.remove("#opacity-5")
+                this.nie = ""
+                this.observations = ""
+                this.spinnerShow = true
+              }
+            })
+          }
 
           /*
           let userData = await baseConnectSearch("user" ,"user" ,"nie" , this.nie.toUpperCase())
@@ -173,6 +219,15 @@ export default {
         }
       })
       this.arrayfiles = newArray
+    },
+    async sendEmail(donde, asunto, cuerpo) {
+      let response = ""
+      await fetch(`/api/alerts/email?asunto=${asunto}&donde=${donde}&cuerpo=${cuerpo}`).then(data => {
+        return data.json()
+      }).then(data => {
+        response = data
+      })
+      return response
     },
     txNombres(event) {
       if ((event.keyCode != 32) && (event.keyCode < 48) || (event.keyCode > 57) && (event.keyCode < 65) || (event.keyCode > 90) && (event.keyCode < 97) || (event.keyCode > 122))
